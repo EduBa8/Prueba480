@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Notas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #282c34;
+        }
+
+        .student-form {
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .student-form input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .student-form button {
+            padding: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .student-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .students-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .students-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .average-grade {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Gestión de Notas</h1>
+
+    <form class="student-form" id="student-form">
+        <input type="text" id="firstName" placeholder="Nombre">
+        <input type="text" id="lastName" placeholder="Apellido">
+        <input type="number" id="grade" placeholder="Nota (0-10)">
+        <button type="button" id="addStudent">Agregar</button>
+    </form>
+
+    <section class="students-list" id="students-list">
+        <h2>Lista de Estudiantes</h2>
+        <ul id="studentList"></ul>
+    </section>
+
+    <section class="average-grade" id="average-grade">
+        <h2>Promedio de Notas</h2>
+        <p id="average">0</p>
+    </section>
+</div>
+
+<script>
+    const students = [];
+
+    document.getElementById('addStudent').addEventListener('click', () => {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const grade = parseFloat(document.getElementById('grade').value);
+
+        if (!firstName || !lastName || isNaN(grade) || grade < 0 || grade > 10) {
+            alert('Por favor, completa todos los campos correctamente.');
+            return;
+        }
+
+        const student = { id: Date.now(), firstName, lastName, grade };
+        students.push(student);
+        renderStudents();
+        updateAverage();
+
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('grade').value = '';
+    });
+
+    function renderStudents() {
+        const studentList = document.getElementById('studentList');
+        studentList.innerHTML = '';
+
+        students.forEach(student => {
+            const li = document.createElement('li');
+            li.textContent = `${student.firstName} ${student.lastName} - Nota: ${student.grade}`;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.addEventListener('click', () => {
+                const index = students.findIndex(s => s.id === student.id);
+                students.splice(index, 1);
+                renderStudents();
+                updateAverage();
+            });
+
+            li.appendChild(deleteButton);
+            studentList.appendChild(li);
+        });
+    }
+
+    function updateAverage() {
+        const averageElement = document.getElementById('average');
+        if (students.length === 0) {
+            averageElement.textContent = '0';
+            return;
+        }
+
+        const total = students.reduce((sum, student) => sum + student.grade, 0);
+        const average = (total / students.length).toFixed(2);
+        averageElement.textContent = average;
+    }
+</script>
+</body>
+</html>
